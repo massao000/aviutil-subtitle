@@ -1,14 +1,16 @@
 import os, re
 from binascii import hexlify, b2a_hex
+from glob import glob
+import wave
 
-
-def exo_changer(exo_tmp, text, output_exo_path):
+def exo_changer(exo_tmp, text, output_exo_path, wavs):
     """_summary_
 
     Args:
         exo_tmp (_type_): exofile
         text (_type_): テキスト
         output_exo_path (_type_): 出力場所
+        wavs (_type_): 音声ファイルの場所
     """
 
     exedit = {}
@@ -43,6 +45,11 @@ def exo_changer(exo_tmp, text, output_exo_path):
                         
     texts = text.split('\n')
 
+    # 使用例
+    wavs = 'D:/program/python/myapp/aviutil_text/31雪の結晶、君の笑顔ok'
+    wav_info_dict = create_wav_info_dict(wavs)
+    keys = list(wav_info_dict.keys())
+    
     sectionsnum = sectionsnum + 1
     sectioncount = 0
     deltaframes = originalend-originalstart
@@ -59,9 +66,17 @@ def exo_changer(exo_tmp, text, output_exo_path):
             
         hex_padding = "0000" * (4096 // 4)  # Paddingを事前に生成
 
-        for text in texts:
-            print(text)
-            # for k, v in filtered_items:
+        for num, text in enumerate(texts):
+            # print(text)
+            try:
+                first_key = keys[num]
+                first_value = wav_info_dict[first_key]
+                audio_file_path = first_value['file_path']
+                duration = first_value['duration']
+            except:
+                audio_file_path = ''
+                duration = 100
+            
             for k, v in zero.items():
                 
                 m = re.match(r'^\d+$', k)
@@ -70,8 +85,11 @@ def exo_changer(exo_tmp, text, output_exo_path):
                     output_str = f"[{currentsection:d}]\n"
 
                     for vk, vv in v.items():
-                        if vk == "start" or vk == "end":
-                            output_str += f"{vk:s}={startpos + int(vv):d}\n"
+                        if vk == "start":
+                        # if vk == "start" or vk == "end":
+                            output_str += f"{vk:s}={startpos + int(vv)}\n"
+                        elif vk == "end":
+                            output_str += f"{vk:s}={startpos + duration}\n"
                         else:
                             output_str += f"{vk:s}={vv:s}"
 
@@ -85,6 +103,8 @@ def exo_changer(exo_tmp, text, output_exo_path):
                         if vk == "text":
                             text_in_utf16 = b2a_hex(text.encode('utf-16')).decode("ascii")[4:]
                             output_str += f"text={text_in_utf16}{hex_padding[len(text_in_utf16):]}\n"
+                        elif vk == "file":
+                            output_str += f"file={audio_file_path}\n"
                         else:
                             output_str += f"{vk:s}={vv:s}"
 
@@ -93,10 +113,33 @@ def exo_changer(exo_tmp, text, output_exo_path):
                 
 
             sectioncount += sectionsnum
-            startpos += deltaframes
-            
-if __name__ == "__main__":
-    x = 'D:\\YouTube\\裏路地朗読茶房\\Tmp\\mojitest.exo'
-    textfile = "暑い夏の日、街は静まりかえっていた。 \n彼女は仕事の疲れを感じながらも、\nスーパーの冷やかしコーナーで冷たいジュースを手に入れた。\n会計待ちの列で目に入ったのは、焦げ茶の制服を着た老紳士。\n彼が小銭を見つけて手に取り、主人公は心の底から微笑む。\nそして、ジュースを差し出す瞬間、老紳士は驚きと共に笑顔を返した。\n瞬く間に広がる温かい雰囲気。\n広がる日常が、いくつかの細やかな出来事から優しさに満ちた特別な瞬間に変わった。"
-    z = 'script'
-    exo_changer(x, textfile, z)
+            # startpos += deltaframes + 18
+            startpos += duration + 18
+            print(startpos)
+
+def get_wav_duration(file_path):
+    with wave.open(file_path, 'rb') as wav_file:
+        frames = wav_file.getnframes()
+        rate = wav_file.getframerate()
+        duration = frames / float(rate) * 60
+        return int(duration)
+
+
+def create_wav_info_dict(directory_path):
+    wav_files = glob(directory_path + '/*.wav')  # ディレクトリ内のWAVファイルを取得
+
+    wav_info_dict = {}  # ファイルパスと長さを格納する辞書
+
+    for idx, wav_file in enumerate(wav_files, start=1):
+        duration = get_wav_duration(wav_file)
+        key = f"{idx}"  # 連番をキーに追加
+        wav_info_dict[key] = {"file_path": wav_file, "duration": duration}
+
+    return wav_info_dict
+
+
+# if __name__ == "__main__":
+#     x = 'testread.exo'
+#     textfile = "冷たい冬の日、私は君と出会った。\n雪が降る中、君の笑顔はまるで暖かな陽だまり。\n一緒に歩きながら、君は言った。\n「雪の結晶みたいに、君との瞬間が特別なんだ」\nその言葉が心に染み入り、君との冒険が始まった。\n雪が降り積もる中、二人は互いに寄り添い、\n細やかな気遣いで心を通わせた。\nそして、冬が終わりを告げる頃、\n君の言葉が空気に溶けて、愛の温もりが残る。"
+#     z = 'D:/program/python/myapp/aviutil_text/31雪の結晶、君の笑顔ok'
+#     exo_changer(x, textfile, z)
