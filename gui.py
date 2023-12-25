@@ -17,6 +17,7 @@ except FileNotFoundError:
 layout = [
     [sg.Text('exoファイル:', size=(15)), sg.InputText(default_text=default_exo,key='-EXO_FILE', disabled_readonly_background_color="gray", disabled=True), sg.FileBrowse(file_types=(("exoファイル", "*.exo"),))],
     [sg.Text('テキストファイル:'), sg.InputText(key='-TEXT_FILE', enable_events=True, disabled_readonly_background_color="gray", disabled=True), sg.FileBrowse(file_types=(("テキストファイル", "*.txt"),), enable_events=True)],
+    [sg.Text('オーディオディレクトリ:'), sg.InputText(key='-AUDIO_PATH', enable_events=True, disabled_readonly_background_color="gray", disabled=True), sg.FolderBrowse(enable_events=True)],
     [sg.Multiline(default_text='', size=(70, 10), key='-TEXT_OUTPUT')],
     [sg.Text('保存ディレクトリ:'), sg.InputText(key='-OUTPUT_DIR', disabled_readonly_background_color="gray", disabled=True), sg.FolderBrowse()],
     [sg.Button('変換', size=(30, 1), k='-EXECUTION')]
@@ -42,16 +43,22 @@ while True:
         else:
             sg.popup_error('テキストがありません')
             
+        if values['-AUDIO_PATH']:
+            audio_dir = values['-AUDIO_PATH']
+        else:
+            sg.popup_error('出力先がありません')
+            
         if values['-OUTPUT_DIR']:
             output_dir = values['-OUTPUT_DIR']
         else:
             sg.popup_error('出力先がありません')
             
         if exo_file_path != '' and texts != '' and output_dir != '':
-            exo_changer(exo_file_path, texts, output_dir)
+            exo_changer(exo_file_path, texts, output_dir, audio_dir)
             window['-TEXT_OUTPUT'].update('')
             window['-OUTPUT_DIR'].update('')
             window['-TEXT_FILE'].update('')
+            window['-AUDIO_PATH'].update('')
 
     if event == '-TEXT_FILE':
         # テキストファイルが選択されたときに内容をMultilineに表示
@@ -62,8 +69,11 @@ while True:
                 with open(text_file_path, 'r', encoding='UTF-8') as text_file:
                     text_data = text_file.read()
                     window['-TEXT_OUTPUT'].update(text_data)
-                window['-OUTPUT_DIR'].update(os.path.dirname(text_file_path))
+                save_dir = os.path.dirname(text_file_path)
+                window['-OUTPUT_DIR'].update(save_dir)
+                window['-AUDIO_PATH'].update(save_dir)
                 
             except Exception as e:
                 sg.popup_error(f'エラーが発生しました: {str(e)}', title='エラー')
+                
 window.close()
