@@ -3,7 +3,7 @@ aviutilの字幕付けを楽にするGUI
 
 ## テンプレートの作成
 
-![image](https://github.com/massao000/aviutil-subtitle/assets/69783019/801c257b-bad8-4ebb-a3e0-8ce13e45647d)
+![image](https://github.com/massao000/aviutil-subtitle/assets/69783019/3e40f253-2bcf-4311-8785-0d58cc4a42be)
 
 1. テンプレートにしたいテキストをレイヤーに入る
 1. 拡張編集内で右クリック
