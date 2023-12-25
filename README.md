@@ -21,11 +21,30 @@ GUIは以下のようなものになります
 
 テキストファイル欄にある`Browse`を押すと以下のようになります
 
-![image](https://github.com/massao000/aviutil-subtitle/assets/69783019/0673a84e-bc43-4d26-9e3b-568de5f98ebb)
+<!-- ![image](https://github.com/massao000/aviutil-subtitle/assets/69783019/0673a84e-bc43-4d26-9e3b-568de5f98ebb) -->
+
+![image](https://github.com/massao000/aviutil-subtitle/assets/69783019/69ea0d73-54d3-4ac2-9891-66fe0edf0346)
+
+変換するときのファイル構成
+```
+Folder
+├─audio.wav
+├─audio.wav
+├─audio.wav
+└─text.txt
+```
+
+新しくオーディオディレクトリの選択を増やしました。
+これはテキストのオブジェクトを音声に合わせて配置するようにしました。
+自動で読み込んだテキストファイルのディレクトリに選択されます。
+
+ファイル構成のようにしていれば楽にできます。
+
+注意としては音声ファイルとテキストの行数を合わせてください
+![image](https://github.com/massao000/aviutil-subtitle/assets/69783019/10451880-5c49-4361-8592-44b63a0554f4)
 
 - 表示されたテキストは編集が可能です
 - 自動で読み込んだテキストファイルのディレクトリに保存先の設定がされます、保存先の指定も可能です
-- 改行ごとにオブジェクトが生成されます
 - 変換ボタンを押せば保存されます。
 - 保存名は`jimaku.exo`
 
