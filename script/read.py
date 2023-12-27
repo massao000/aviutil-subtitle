@@ -60,8 +60,8 @@ def exo_changer(exo_tmp, text, output_exo_path, wavs):
         output_str = "[exedit]\n"
         f2.write(output_str)
         for k,v in exedit.items():
-            # print(f"{k:s}={v:s}",end="")
-            output_str = f"{k:s}={v:s}"
+            # print(f"{k}={v}",end="")
+            output_str = f"{k}={v}"
             f2.write(output_str)
             
         hex_padding = "0000" * (4096 // 4)  # Paddingを事前に生成
@@ -87,17 +87,17 @@ def exo_changer(exo_tmp, text, output_exo_path, wavs):
                     for vk, vv in v.items():
                         if vk == "start":
                         # if vk == "start" or vk == "end":
-                            output_str += f"{vk:s}={startpos + int(vv)}\n"
+                            output_str += f"{vk}={startpos + int(vv)}\n"
                         elif vk == "end":
-                            output_str += f"{vk:s}={startpos + duration}\n"
+                            output_str += f"{vk}={startpos + duration}\n"
                         else:
-                            output_str += f"{vk:s}={vv:s}"
+                            output_str += f"{vk}={vv}"
 
                     f2.write(output_str)
-                    # print(output_str)
+                    # print(f"1 --- {output_str}")
                 else:
                     sectionname = re.sub(r'^\d+', str(currentsection), k)
-                    output_str = f"[{sectionname:s}]\n"
+                    output_str = f"[{sectionname}]\n"
 
                     for vk, vv in v.items():
                         if vk == "text":
@@ -105,17 +105,23 @@ def exo_changer(exo_tmp, text, output_exo_path, wavs):
                             output_str += f"text={text_in_utf16}{hex_padding[len(text_in_utf16):]}\n"
                         elif vk == "file":
                             output_str += f"file={audio_file_path}\n"
+                        elif vk == "イン" or vk == "アウト":
+                            if 150 >= duration:
+                                output_str += f"{vk}=0.5\n"
                         else:
-                            output_str += f"{vk:s}={vv:s}"
+                            output_str += f"{vk}={vv}"
+                        
 
                     f2.write(output_str)
-                    # print(output_str)
+                    # print(f"2 --- {output_str}")
+                    # print(f"2 --- {duration}")
                 
 
             sectioncount += sectionsnum
             # startpos += deltaframes + 18
-            startpos += duration + 18
-            print(startpos)
+            flame_num = 60 * 0.3 # 18　0.3は秒数 フレーム数を計算
+            startpos += duration + flame_num
+            # print(startpos)
 
 def get_wav_duration(file_path):
     with wave.open(file_path, 'rb') as wav_file:
@@ -138,8 +144,8 @@ def create_wav_info_dict(directory_path):
     return wav_info_dict
 
 
-# if __name__ == "__main__":
-#     x = 'testread.exo'
-#     textfile = "冷たい冬の日、私は君と出会った。\n雪が降る中、君の笑顔はまるで暖かな陽だまり。\n一緒に歩きながら、君は言った。\n「雪の結晶みたいに、君との瞬間が特別なんだ」\nその言葉が心に染み入り、君との冒険が始まった。\n雪が降り積もる中、二人は互いに寄り添い、\n細やかな気遣いで心を通わせた。\nそして、冬が終わりを告げる頃、\n君の言葉が空気に溶けて、愛の温もりが残る。"
-#     z = 'D:/program/python/myapp/aviutil_text/31雪の結晶、君の笑顔ok'
-#     exo_changer(x, textfile, z)
+if __name__ == "__main__":
+    x = 'testread.exo'
+    textfile = "冷たい冬の日、私は君と出会った。\n雪が降る中、君の笑顔はまるで暖かな陽だまり。\n一緒に歩きながら、君は言った。\n「雪の結晶みたいに、君との瞬間が特別なんだ」\nその言葉が心に染み入り、君との冒険が始まった。\n雪が降り積もる中、二人は互いに寄り添い、\n細やかな気遣いで心を通わせた。\nそして、冬が終わりを告げる頃、\n君の言葉が空気に溶けて、愛の温もりが残る。"
+    z = 'D:/program/python/myapp/aviutil-subtitle/31雪の結晶、君の笑顔ok'
+    exo_changer(x, textfile, z, z)
